@@ -32,7 +32,7 @@ public class FichaPacienteGateway {
         return FichaPacienteMapper.toEntidade(optionalFichaPacienteDto.get());
     }
 
-    public void deleteFichaPacienteById(Long id) {
-        fichaPacienteDataSource.deleteFichaPacienteById(id);
+    public void deleteFichaPacienteById(Long pacienteId) {
+        fichaPacienteDataSource.deleteFichaPacienteById(pacienteId);
     }
 }

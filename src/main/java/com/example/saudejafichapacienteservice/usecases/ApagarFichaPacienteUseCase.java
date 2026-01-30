@@ -13,6 +13,6 @@ public class ApagarFichaPacienteUseCase {
 
     public void executar(Long pacienteId) {
         FichaPaciente fichaPaciente = fichaPacienteGateway.getFichaPacienteByPacienteId(pacienteId);
-        fichaPacienteGateway.deleteFichaPacienteById(fichaPaciente.getId());
+        fichaPacienteGateway.deleteFichaPacienteById(fichaPaciente.getPaciente());
     }
 }

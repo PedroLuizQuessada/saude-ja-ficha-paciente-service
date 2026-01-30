@@ -53,7 +53,10 @@ public class FichaPacienteRepoJpaImpl implements FichaPacienteDataSource {
     }
 
     @Override
-    public void deleteFichaPacienteById(Long id) {
-
+    @Transactional
+    public void deleteFichaPacienteById(Long pacienteId) {
+        Query query = entityManager.createQuery("DELETE FROM FichaPacienteJpa fichaPaciente WHERE fichaPaciente.paciente = :pacienteId");
+        query.setParameter("pacienteId", pacienteId);
+        query.executeUpdate();
     }
 }
