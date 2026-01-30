@@ -2,7 +2,7 @@
 1) Abrir CMD
 2) Acessar o diretório onde consta o jar "h2-2.3.232.jar"
 3) Executar o comando "java -cp h2-2.3.232.jar org.h2.tools.Server -tcp -tcpAllowOthers -ifNotExists"
-4) Swagger estará disponível em: http://localhost:8080/saude-ja-ficha-paciente-service/swagger-ui/index.html
+4) Swagger estará disponível em: http://localhost:8082/saude-ja-ficha-paciente-service/swagger-ui/index.html
 <br><br>obs.: a aplicação faz parte do projeto saude-ja (https://github.com/stars/PedroLuizQuessada/lists/sa%C3%BAde-j%C3%A1)
 
 # Alterações para ambientes corporativos:
