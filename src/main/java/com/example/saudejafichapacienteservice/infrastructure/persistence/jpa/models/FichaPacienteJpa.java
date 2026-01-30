@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "fichas_pacientes")
+@Table(name = "fichas_paciente")
 @Getter
 @NoArgsConstructor
 @Profile("jpa")
