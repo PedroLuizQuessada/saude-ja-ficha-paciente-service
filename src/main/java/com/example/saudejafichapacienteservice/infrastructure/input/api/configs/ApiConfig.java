@@ -12,6 +12,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -32,7 +33,10 @@ public class ApiConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(WHITE_LIST_URL).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/fichas-paciente").hasAnyAuthority(TipoUsuarioEnum.MEDICO.name(), TipoUsuarioEnum.ENFERMEIRO.name())
@@ -40,11 +44,14 @@ public class ApiConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/fichas-paciente").hasAuthority(TipoUsuarioEnum.PACIENTE.name())
                                 .requestMatchers(HttpMethod.PUT, "/api/v1/fichas-paciente").hasAnyAuthority(TipoUsuarioEnum.MEDICO.name(), TipoUsuarioEnum.ENFERMEIRO.name())
                                 .anyRequest().authenticated())
+
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler))
+
                 .oauth2ResourceServer(
                         conf -> conf.jwt(Customizer.withDefaults()));
+
         return http.build();
     }
 
