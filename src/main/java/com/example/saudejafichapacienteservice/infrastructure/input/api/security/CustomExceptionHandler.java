@@ -3,6 +3,7 @@ package com.example.saudejafichapacienteservice.infrastructure.input.api.securit
 import com.example.saudejafichapacienteservice.exceptions.BadArgumentException;
 import com.example.saudejafichapacienteservice.exceptions.NaoEncontradoException;
 import com.example.saudejafichapacienteservice.infrastructure.exceptions.TipoTokenException;
+import com.example.saudejafichapacienteservice.infrastructure.exceptions.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
@@ -23,6 +24,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleBadRequest(RuntimeException ex) {
         log.error(ex.getMessage(), ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(value = { UnauthorizedException.class })
+    public ProblemDetail handleUnauthorized(RuntimeException ex) {
+        log.error(ex.getMessage(), ex);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
     @ExceptionHandler(value = { TipoTokenException.class })

@@ -2,7 +2,9 @@ package com.example.saudejafichapacienteservice.gateways;
 
 import com.example.saudejafichapacienteservice.datasources.FichaPacienteDataSource;
 import com.example.saudejafichapacienteservice.dtos.FichaPacienteDto;
+import com.example.saudejafichapacienteservice.dtos.PacienteIdDtoPage;
 import com.example.saudejafichapacienteservice.entidades.FichaPaciente;
+import com.example.saudejafichapacienteservice.entidades.PacienteIdPage;
 import com.example.saudejafichapacienteservice.exceptions.NaoEncontradoException;
 import com.example.saudejafichapacienteservice.mappers.FichaPacienteMapper;
 
@@ -34,5 +36,10 @@ public class FichaPacienteGateway {
 
     public void deleteFichaPacienteById(Long pacienteId) {
         fichaPacienteDataSource.deleteFichaPacienteById(pacienteId);
+    }
+
+    public PacienteIdPage getPacientesHipertensosId(int page, int size) {
+        PacienteIdDtoPage pacienteIdDtoPage = fichaPacienteDataSource.getPacientesHipertensosId(page, size);
+        return new PacienteIdPage(pacienteIdDtoPage.getPage(), pacienteIdDtoPage.getSize(), pacienteIdDtoPage.getContent());
     }
 }

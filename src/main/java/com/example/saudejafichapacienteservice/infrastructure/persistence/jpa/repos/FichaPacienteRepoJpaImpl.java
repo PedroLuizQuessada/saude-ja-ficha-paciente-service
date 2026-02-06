@@ -2,12 +2,10 @@ package com.example.saudejafichapacienteservice.infrastructure.persistence.jpa.r
 
 import com.example.saudejafichapacienteservice.datasources.FichaPacienteDataSource;
 import com.example.saudejafichapacienteservice.dtos.FichaPacienteDto;
+import com.example.saudejafichapacienteservice.dtos.PacienteIdDtoPage;
 import com.example.saudejafichapacienteservice.infrastructure.persistence.jpa.mappers.FichaPacienteJpaDtoMapper;
 import com.example.saudejafichapacienteservice.infrastructure.persistence.jpa.models.FichaPacienteJpa;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -58,5 +56,17 @@ public class FichaPacienteRepoJpaImpl implements FichaPacienteDataSource {
         Query query = entityManager.createQuery("DELETE FROM FichaPacienteJpa fichaPaciente WHERE fichaPaciente.paciente = :pacienteId");
         query.setParameter("pacienteId", pacienteId);
         query.executeUpdate();
+    }
+
+    @Override
+    public PacienteIdDtoPage getPacientesHipertensosId(int page, int size) {
+        int offset = Math.max(0, page) * Math.max(1, size);
+
+        String jpql = "SELECT fichaPaciente.paciente FROM FichaPacienteJpa fichaPaciente WHERE fichaPaciente.hipertensao = true ORDER BY fichaPaciente.id";
+        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class)
+                .setFirstResult(offset)
+                .setMaxResults(size);
+
+        return new PacienteIdDtoPage(page, size, query.getResultList());
     }
 }
