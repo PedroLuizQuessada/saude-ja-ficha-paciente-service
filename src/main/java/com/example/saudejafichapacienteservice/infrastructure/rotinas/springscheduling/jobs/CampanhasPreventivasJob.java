@@ -20,7 +20,7 @@ public class CampanhasPreventivasJob {
         this.notificacaoController = new NotificacaoController(fichaPacienteDataSource, usuarioDataSource, notificacaoDataSource);
     }
 
-    @Scheduled(cron = "0 26 16 * * ?", zone = "America/Sao_Paulo")
+    @Scheduled(cron = "0 0 9 1 * ?", zone = "America/Sao_Paulo")
     public void notificarPacientesHipertensos() {
         log.info("Enviando notificação para pacientes hipertensos");
         notificacaoController.notificarPacientesHipertensos();
