@@ -9,7 +9,7 @@ import java.util.Base64;
 @Service
 @Profile("restclient")
 public class Base64Service {
-    public String getUsuarioSenhaCriptografado(String usuario, String senha) {
+    String getUsuarioSenhaCriptografado(String usuario, String senha) {
         String combinado = usuario + ":" + senha;
         return Base64.getEncoder().encodeToString(combinado.getBytes(StandardCharsets.UTF_8));
     }

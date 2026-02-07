@@ -12,10 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-
-import java.nio.charset.StandardCharsets;
 
 @Service
 @Profile("restclient")
@@ -31,9 +28,12 @@ public class UsuarioRestClientImpl implements UsuarioDataSource {
 
     private final AutenticacaoController autenticacaoController;
 
-    public UsuarioRestClientImpl(RestClient client, AutenticacaoDataSource autenticacaoDataSource) {
+    private final ClientResponseService clientResponseService;
+
+    public UsuarioRestClientImpl(RestClient client, AutenticacaoDataSource autenticacaoDataSource, ClientResponseService clientResponseService) {
         this.client = client;
         this.autenticacaoController = new AutenticacaoController(autenticacaoDataSource);
+        this.clientResponseService = clientResponseService;
     }
 
     @Override
@@ -44,30 +44,21 @@ public class UsuarioRestClientImpl implements UsuarioDataSource {
                 .body(pacienteIdPageRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    var contentType = res.getHeaders().getContentType();
-                    var charset = (contentType != null && contentType.getCharset() != null)
-                            ? contentType.getCharset()
-                            : StandardCharsets.UTF_8;
-
-                    String body = StreamUtils.copyToString(res.getBody(), charset);
-
                     if (res.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
                         throw new UnauthorizedException();
                     }
                     if (res.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
                         throw new ForbiddenException();
                     }
-                    throw new RuntimeException(
-                            "Falha no serviço de usuários (usuario-service). Corpo: " + body
-                    );
+                    else {
+                        String body = clientResponseService.getResponseBody(res);
+                        throw new RuntimeException(
+                                "Falha no serviço de usuários (usuario-service). Corpo: " + body
+                        );
+                    }
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    var contentType = res.getHeaders().getContentType();
-                    var charset = (contentType != null && contentType.getCharset() != null)
-                            ? contentType.getCharset()
-                            : StandardCharsets.UTF_8;
-
-                    String body = StreamUtils.copyToString(res.getBody(), charset);
+                    String body = clientResponseService.getResponseBody(res);
 
                     throw new RuntimeException(
                             "Erro interno no serviço de usuários (usuario-service). Corpo: " + body

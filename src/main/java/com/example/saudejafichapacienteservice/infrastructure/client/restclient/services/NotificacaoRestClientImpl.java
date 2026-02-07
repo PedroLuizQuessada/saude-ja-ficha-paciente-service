@@ -12,10 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-
-import java.nio.charset.StandardCharsets;
 
 @Service
 @Profile("restclient")
@@ -31,9 +28,12 @@ public class NotificacaoRestClientImpl implements NotificacaoDataSource {
 
     private final AutenticacaoController autenticacaoController;
 
-    public NotificacaoRestClientImpl(RestClient client, AutenticacaoDataSource autenticacaoDataSource) {
+    private final ClientResponseService clientResponseService;
+
+    public NotificacaoRestClientImpl(RestClient client, AutenticacaoDataSource autenticacaoDataSource, ClientResponseService clientResponseService) {
         this.client = client;
         this.autenticacaoController = new AutenticacaoController(autenticacaoDataSource);
+        this.clientResponseService = clientResponseService;
     }
 
     @Override
@@ -44,12 +44,7 @@ public class NotificacaoRestClientImpl implements NotificacaoDataSource {
                 .body(enviarNotificacaoRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    var contentType = res.getHeaders().getContentType();
-                    var charset = (contentType != null && contentType.getCharset() != null)
-                            ? contentType.getCharset()
-                            : StandardCharsets.UTF_8;
-
-                    String body = StreamUtils.copyToString(res.getBody(), charset);
+                    String body = clientResponseService.getResponseBody(res);
 
                     if (res.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
                         throw new BadRequestException(
@@ -62,17 +57,14 @@ public class NotificacaoRestClientImpl implements NotificacaoDataSource {
                     if (res.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
                         throw new ForbiddenException();
                     }
-                    throw new RuntimeException(
-                            "Falha no serviço de notificações (notificacao-service). Corpo: " + body
-                    );
+                    else {
+                        throw new RuntimeException(
+                                "Falha no serviço de notificações (notificacao-service). Corpo: " + body
+                        );
+                    }
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    var contentType = res.getHeaders().getContentType();
-                    var charset = (contentType != null && contentType.getCharset() != null)
-                            ? contentType.getCharset()
-                            : StandardCharsets.UTF_8;
-
-                    String body = StreamUtils.copyToString(res.getBody(), charset);
+                    String body = clientResponseService.getResponseBody(res);
 
                     throw new RuntimeException(
                             "Erro interno no serviço de notificações (notificacao-service). Corpo: " + body

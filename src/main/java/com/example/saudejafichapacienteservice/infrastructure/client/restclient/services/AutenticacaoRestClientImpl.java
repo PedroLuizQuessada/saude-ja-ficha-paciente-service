@@ -26,9 +26,12 @@ public class AutenticacaoRestClientImpl implements AutenticacaoDataSource {
 
     private final Base64Service base64Service;
 
-    public AutenticacaoRestClientImpl(RestClient client, Base64Service base64Service) {
+    private final ClientResponseService clientResponseService;
+
+    public AutenticacaoRestClientImpl(RestClient client, Base64Service base64Service, ClientResponseService clientResponseService) {
         this.client = client;
         this.base64Service = base64Service;
+        this.clientResponseService = clientResponseService;
     }
 
     @Override
@@ -41,13 +44,16 @@ public class AutenticacaoRestClientImpl implements AutenticacaoDataSource {
                         {
                             if (res.getStatusCode().equals(HttpStatus.UNAUTHORIZED))
                                 throw new UnauthorizedException();
-                            else
-                                throw new RuntimeException("Falha no serviço de autenticação (authentication-service).");
+                            else {
+                                String body = clientResponseService.getResponseBody(res);
+                                throw new RuntimeException("Falha no serviço de autenticação (authentication-service). Corpo: " + body);
+                            }
                         }
                 )
                 .onStatus(HttpStatusCode::is5xxServerError, (req, res) ->
                         {
-                            throw new RuntimeException("Falha no serviço de autenticação (authentication-service).");
+                            String body = clientResponseService.getResponseBody(res);
+                            throw new RuntimeException("Falha no serviço de autenticação (authentication-service). Corpo: " + body);
                         }
                 )
                 .toEntity(String.class).getBody();
