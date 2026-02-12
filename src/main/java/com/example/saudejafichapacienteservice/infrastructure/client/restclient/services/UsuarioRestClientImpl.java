@@ -39,7 +39,7 @@ public class UsuarioRestClientImpl implements UsuarioDataSource {
     @Override
     public UsuarioEmailPageResponse getUsuarioPacienteEmailFromId(PacienteIdPageRequest pacienteIdPageRequest) {
         return client.post()
-                .uri(urlBase + "/api/v1/usuarios/emails")
+                .uri(urlBase + "/api/v1/usuarios/pacientes/emails")
                 .header("Authorization", "Bearer " + autenticacaoController.gerarTokenServico(audiencia))
                 .body(pacienteIdPageRequest)
                 .retrieve()
