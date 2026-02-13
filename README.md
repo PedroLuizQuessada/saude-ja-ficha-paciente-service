@@ -7,4 +7,5 @@
 
 # Alterações para ambientes corporativos:
 1) Adição do arquivo src/main/resources/application-jpa.properties no .gitignore
-2) Adição dos arquivos da pasta src/main/resources/keys no .gitignore
+2) Adição do arquivo src/main/resources/application-restclient.properties no .gitignore
+3) Adição dos arquivos da pasta src/main/resources/keys no .gitignore
